@@ -25,5 +25,8 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves a single article based on a given id"
   }
 }
