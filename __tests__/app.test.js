@@ -8,6 +8,8 @@ const userData = require("../db/data/test-data/users");
 const articleData = require("../db/data/test-data/articles");
 const commentData = require("../db/data/test-data/comments");
 
+const endpoints = require("../endpoints.json");
+
 beforeEach(() => {
   return seed({ topicData, userData, articleData, commentData });
 });
@@ -41,6 +43,19 @@ describe("ANY /api/banana", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("path not found");
+      });
+  });
+});
+
+describe("GET /api", () => {
+  test("GET:200 provides a description of all other endpoints available", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        expect(
+          JSON.stringify(res.body.endpoints) === JSON.stringify(endpoints)
+        ).toBe(true);
       });
   });
 });
