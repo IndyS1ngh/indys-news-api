@@ -66,13 +66,14 @@ describe("GET /api/articles/:article_id", () => {
       .then((res) => {
         expect(res.body.article).toMatchObject({
           article_id: 1,
-          title: expect.any(String),
-          topic: expect.any(String),
-          author: expect.any(String),
-          body: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-          article_img_url: expect.any(String),
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         });
       });
   });
@@ -101,6 +102,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((res) => {
         expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("created_at", { descending: true });
         expect(res.body.articles[0]).toMatchObject({
           article_id: 3,
           title: "Eight pug gifs that remind me of mitch",
