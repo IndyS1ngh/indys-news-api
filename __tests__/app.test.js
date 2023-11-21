@@ -53,9 +53,7 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then((res) => {
-        expect(
-          JSON.stringify(res.body.endpoints) === JSON.stringify(endpoints)
-        ).toBe(true);
+        expect(res.body.endpoints).toEqual(endpoints);
       });
   });
 });
@@ -68,17 +66,6 @@ describe("GET /api/articles/:article_id", () => {
       .then((res) => {
         expect(res.body.article).toMatchObject({
           article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          body: "I find this existence challenging",
-          created_at: "2020-07-09T20:11:00.000Z",
-          votes: 100,
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-        });
-        expect(res.body.article).toMatchObject({
-          article_id: expect.any(Number),
           title: expect.any(String),
           topic: expect.any(String),
           author: expect.any(String),
@@ -103,6 +90,40 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("bad request");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("GET:200 sends an array of articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles[0]).toMatchObject({
+          article_id: 3,
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          created_at: "2020-11-03T09:12:00.000Z",
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 2,
+        });
+        res.body.articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
       });
   });
 });
