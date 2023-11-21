@@ -20,3 +20,11 @@ exports.formatComments = (comments, idLookup) => {
     };
   });
 };
+
+exports.createLookupObject = (data, key, value) => {
+  const lookupObj = {};
+  for (let i = 0; i < data.length; i++) {
+    lookupObj[data[i][key]] = data[i][value];
+  }
+  return lookupObj;
+};

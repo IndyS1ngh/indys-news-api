@@ -2,6 +2,7 @@ const {
   convertTimestampToDate,
   createRef,
   formatComments,
+  createLookupObject,
 } = require("../db/seeds/utils");
 
 describe("convertTimestampToDate", () => {
@@ -100,5 +101,61 @@ describe("formatComments", () => {
     const comments = [{ created_at: timestamp }];
     const formattedComments = formatComments(comments, {});
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
+  });
+});
+
+describe("createLookupObject", () => {
+  test("returns an empty obj when passed an empty input", () => {
+    const input = [];
+    const expected = {};
+    const actual = createLookupObject(input, "article_id", "comment_count");
+    expect(actual).toEqual(expected);
+  });
+  test("returns a basic lookup obj when passed an input with a single obj", () => {
+    const input = [{ article_id: 1, comment_count: "11" }];
+    const expected = { 1: "11" };
+    const actual = createLookupObject(input, "article_id", "comment_count");
+    expect(actual).toEqual(expected);
+  });
+  test("returns a lookup obj when passed an input with many objs", () => {
+    const input = [
+      { article_id: 1, comment_count: "11" },
+      { article_id: 3, comment_count: "2" },
+      { article_id: 5, comment_count: "2" },
+      { article_id: 6, comment_count: "1" },
+      { article_id: 9, comment_count: "2" },
+    ];
+    const expected = { 1: "11", 3: "2", 5: "2", 6: "1", 9: "2" };
+    const actual = createLookupObject(input, "article_id", "comment_count");
+    expect(actual).toEqual(expected);
+  });
+  test("should return a new object (reference test)", () => {
+    const input = [
+      { article_id: 1, comment_count: "11" },
+      { article_id: 3, comment_count: "2" },
+      { article_id: 5, comment_count: "2" },
+      { article_id: 6, comment_count: "1" },
+      { article_id: 9, comment_count: "2" },
+    ];
+    const actual = createLookupObject(input);
+    expect(actual).not.toBe(input);
+  });
+  test("should not mutate input", () => {
+    const input = [
+      { article_id: 1, comment_count: "11" },
+      { article_id: 3, comment_count: "2" },
+      { article_id: 5, comment_count: "2" },
+      { article_id: 6, comment_count: "1" },
+      { article_id: 9, comment_count: "2" },
+    ];
+    const copyInput = [
+      { article_id: 1, comment_count: "11" },
+      { article_id: 3, comment_count: "2" },
+      { article_id: 5, comment_count: "2" },
+      { article_id: 6, comment_count: "1" },
+      { article_id: 9, comment_count: "2" },
+    ];
+    createLookupObject(input);
+    expect(input).toEqual(copyInput);
   });
 });
