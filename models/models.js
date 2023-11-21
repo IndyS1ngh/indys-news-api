@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const { createLookupObject } = require("../db/seeds/utils");
 const endpoints = require("../endpoints.json");
 
 exports.selectTopics = () => {
@@ -32,6 +31,17 @@ exports.selectArticles = () => {
       for (let i = 0; i < rows.length; i++) {
         rows[i].comment_count = +rows[i].comment_count;
       }
+      return rows;
+    });
+};
+
+exports.selectCommentsByArticle = (article_id) => {
+  return db
+    .query(
+      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`,
+      [article_id]
+    )
+    .then(({ rows }) => {
       return rows;
     });
 };
