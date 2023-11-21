@@ -24,30 +24,14 @@ exports.selectArticleById = (article_id) => {
 };
 
 exports.selectArticles = () => {
-  const lookupObjPromise = db
+  return db
     .query(
-      `SELECT article_id, COUNT(article_id) as comment_count FROM comments GROUP BY article_id;`
+      `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM comments RIGHT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id, articles.created_at ORDER BY articles.created_at DESC;`
     )
     .then(({ rows }) => {
-      const lookupObj = createLookupObject(rows, "article_id", "comment_count");
-      return lookupObj;
-    });
-  const articlesPromise = db
-    .query(`SELECT * FROM articles ORDER BY created_at DESC;`)
-    .then(({ rows }) => {
+      for (let i = 0; i < rows.length; i++) {
+        rows[i].comment_count = +rows[i].comment_count;
+      }
       return rows;
     });
-  return Promise.all([articlesPromise, lookupObjPromise]).then((values) => {
-    const articles = values[0];
-    const lookupObj = values[1];
-    for (let i = 0; i < articles.length; i++) {
-      if (lookupObj.hasOwnProperty(articles[i].article_id)) {
-        articles[i].comment_count = +lookupObj[articles[i].article_id];
-      } else {
-        articles[i].comment_count = 0;
-      }
-      delete articles[i].body;
-    }
-    return articles;
-  });
 };
