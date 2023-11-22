@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { convertTimestampToDate } = require("../db/seeds/utils");
 const endpoints = require("../endpoints.json");
 
 exports.selectTopics = () => {
@@ -43,5 +44,20 @@ exports.selectCommentsByArticle = (article_id) => {
     )
     .then(({ rows }) => {
       return rows;
+    });
+};
+
+exports.insertComment = (article_id, newComment) => {
+  const { body, username } = newComment;
+  const created_at = Date.now();
+  const dateObject = convertTimestampToDate({ created_at });
+  const date = dateObject.created_at;
+  return db
+    .query(
+      `INSERT INTO comments (body, author, article_id, votes, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
+      [body, username, article_id, (votes = 0), date]
+    )
+    .then(({ rows }) => {
+      return rows[0];
     });
 };

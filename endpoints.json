@@ -45,5 +45,21 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves a comment that was added to an article",
+    "queries": [],
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 21,
+          "body": "I love apples.",
+          "article_id": 2,
+          "author": "weegembump",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0
+        }
+      ]
+    }
   }
 }
