@@ -206,6 +206,18 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(res.body.msg).toBe("bad request");
       });
   });
+  test("POST:404 responds with an appropriate status and error message when provided with a username that doesn't exist", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        body: "I love bananas.",
+        username: "bananaguy",
+      })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
   test("POST:404 sends an err msg when given a valid but non-existent article id", () => {
     return request(app)
       .post("/api/articles/999/comments")

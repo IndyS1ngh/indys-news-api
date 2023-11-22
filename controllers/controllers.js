@@ -60,14 +60,8 @@ exports.postComment = (req, res, next) => {
   const { article_id } = req.params;
   const newComment = req.body;
 
-  const articlePromises = [insertComment(article_id, newComment)];
-
-  if (article_id) {
-    articlePromises.push(checkExists("articles", "article_id", article_id));
-  }
-
-  Promise.all(articlePromises).then((resolvedPromises) => { 
-    const comment = resolvedPromises[0];
+  insertComment(article_id, newComment)
+    .then((comment) => {
       res.status(201).send({ comment });
     })
     .catch(next);
