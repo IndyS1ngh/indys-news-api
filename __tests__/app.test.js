@@ -175,3 +175,71 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("POST:201 sends a posted comment for an article", () => {
+    const newComment = {
+      body: "I love bananas.",
+      username: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(newComment)
+      .expect(201)
+      .then((res) => {
+        expect(res.body.comment.comment_id).toBe(19);
+        expect(res.body.comment.body).toBe("I love bananas.");
+        expect(res.body.comment.votes).toBe(0);
+        expect(res.body.comment.author).toBe("butter_bridge");
+        expect(res.body.comment.article_id).toBe(2);
+        expect(res.body.comment.created_at).toBeString();
+      });
+  });
+  test("POST:400 responds with an appropriate status and error message when provided with a bad comment (no username)", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        body: "I love bananas.",
+      })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+  test("POST:404 responds with an appropriate status and error message when provided with a username that doesn't exist", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        body: "I love bananas.",
+        username: "bananaguy",
+      })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
+  test("POST:404 sends an err msg when given a valid but non-existent article id", () => {
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send({
+        body: "I love bananas.",
+        username: "butter_bridge",
+      })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
+  test("POST:400 sends an err msg when given an invalid article id", () => {
+    return request(app)
+      .post("/api/articles/banana/comments")
+      .send({
+        body: "I love bananas.",
+        username: "butter_bridge",
+      })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+});
