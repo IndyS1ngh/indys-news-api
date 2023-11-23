@@ -81,12 +81,8 @@ exports.patchArticle = (req, res, next) => {
 exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
   removeComment(comment_id)
-    .then((comment) => {
-      if (comment.rowCount === 0) {
-        res.status(404).send({ msg: 'not found' })
-      } else {
-        res.status(204).send();
-      }
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };
