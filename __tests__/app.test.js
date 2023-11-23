@@ -295,3 +295,25 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("DELETE:204 returns relevant status code", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("DELETE:404 returns an err msg if comment id is valid but not found", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
+  test("DELETE:400 returns an err msg if comment id is invalid", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+});
