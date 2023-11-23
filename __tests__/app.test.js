@@ -167,7 +167,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("article does not exist");
+        expect(res.body.msg).toBe("does not exist");
       });
   });
   test("GET:400 sends an err msg when given an invalid id", () => {
@@ -354,12 +354,20 @@ describe("GET /api/articles?topic", () => {
         });
       });
   });
+  test("GET:200 sends an empty array of articles when topic exists but has no associated articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toEqual([]);
+      });
+  });
   test("GET:404 sends an err msg if topic is invalid", () => {
     return request(app)
       .get("/api/articles?topic=banana")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("not found");
+        expect(res.body.msg).toBe("does not exist");
       });
   });
 });

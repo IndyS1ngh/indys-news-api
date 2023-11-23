@@ -36,8 +36,16 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
   const { topic } = req.query;
-  selectArticles(topic)
-    .then((articles) => {
+
+  const articlePromises = [selectArticles(topic)];
+
+  if (topic) {
+    articlePromises.push(checkExists("topics", "slug", topic));
+  }
+
+  Promise.all(articlePromises)
+    .then((resolvedPromises) => {
+      const articles = resolvedPromises[0];
       res.status(200).send({ articles });
     })
     .catch(next);
