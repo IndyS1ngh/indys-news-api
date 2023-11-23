@@ -77,6 +77,14 @@ describe("GET /api/articles/:article_id", () => {
         });
       });
   });
+  test("GET:200 sends an article by id (including comment_count)", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article.comment_count).toBe(11);
+      });
+  });
   test("GET:404 sends an err msg when given a valid but non-existent id", () => {
     return request(app)
       .get("/api/articles/999")
