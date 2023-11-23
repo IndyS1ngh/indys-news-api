@@ -8,6 +8,7 @@ const {
   selectCommentsByArticle,
   insertComment,
   updateArticle,
+  removeComment,
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -73,6 +74,19 @@ exports.patchArticle = (req, res, next) => {
   updateArticle(article_id, req.body)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch(next);
+};
+
+exports.deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  removeComment(comment_id)
+    .then((comment) => {
+      if (comment.rowCount === 0) {
+        res.status(404).send({ msg: 'not found' })
+      } else {
+        res.status(204).send();
+      }
     })
     .catch(next);
 };
