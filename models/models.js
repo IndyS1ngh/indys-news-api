@@ -49,14 +49,11 @@ exports.selectCommentsByArticle = (article_id) => {
 
 exports.insertComment = (article_id, newComment) => {
   const { body, username } = newComment;
-  const created_at = Date.now();
-  const dateObject = convertTimestampToDate({ created_at });
-  const date = dateObject.created_at;
 
   return db
     .query(
-      `INSERT INTO comments (body, author, article_id, votes, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
-      [body, username, article_id, (votes = 0), date]
+      `INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *;`,
+      [body, username, article_id]
     )
     .then(({ rows }) => {
       return rows[0];
