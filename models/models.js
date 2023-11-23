@@ -23,17 +23,17 @@ exports.selectArticleById = (article_id) => {
     });
 };
 
-exports.selectArticles = () => {
-  return db
-    .query(
-      `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM comments RIGHT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id, articles.created_at ORDER BY articles.created_at DESC;`
-    )
-    .then(({ rows }) => {
-      for (let i = 0; i < rows.length; i++) {
-        rows[i].comment_count = +rows[i].comment_count;
-      }
-      return rows;
-    });
+exports.selectArticles = (topic) => {
+  let queryString = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, (COUNT(comments.article_id) :: INTEGER) AS comment_count FROM comments RIGHT JOIN articles ON articles.article_id = comments.article_id `;
+  const queryValues = [];
+  if (topic) {
+    queryValues.push(topic);
+    queryString += `WHERE topic = $1 `;
+  }
+  queryString += `GROUP BY articles.article_id, articles.created_at ORDER BY articles.created_at DESC;`;
+  return db.query(queryString, queryValues).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.selectCommentsByArticle = (article_id) => {
