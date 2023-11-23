@@ -7,6 +7,7 @@ const {
   selectArticles,
   selectCommentsByArticle,
   insertComment,
+  updateArticle,
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -63,6 +64,15 @@ exports.postComment = (req, res, next) => {
   insertComment(article_id, newComment)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.patchArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  updateArticle(article_id, req.body)
+    .then((article) => {
+      res.status(200).send({ article });
     })
     .catch(next);
 };

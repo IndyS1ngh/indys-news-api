@@ -102,7 +102,9 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((res) => {
         expect(res.body.articles.length).toBe(13);
-        expect(res.body.articles).toBeSortedBy("created_at", { descending: true });
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
         expect(res.body.articles[0]).toMatchObject({
           article_id: 3,
           title: "Eight pug gifs that remind me of mitch",
@@ -137,7 +139,9 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(200)
       .then((res) => {
         expect(res.body.comments.length).toBe(11);
-        expect(res.body.comments).toBeSortedBy("created_at", { descending: true });
+        expect(res.body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
         res.body.comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -237,6 +241,54 @@ describe("POST /api/articles/:article_id/comments", () => {
         body: "I love bananas.",
         username: "butter_bridge",
       })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("PATCH:200 updates an articles votes by id and sends the updated article back", () => {
+    const input = { inc_votes: -100 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("PATCH:400 responds with an appropriate status and error message when provided with a bad vote (no inc_votes)", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+  test("PATCH:404 returns an err msg if article id is valid but not found", () => {
+    return request(app)
+      .patch("/api/articles/99")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
+  test("PATCH:400 returns an err msg if article id is invalid", () => {
+    return request(app)
+      .patch("/api/articles/banana")
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("bad request");
