@@ -341,3 +341,25 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("GET /api/articles?topic", () => {
+  test("GET:200 sends an array of articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(1);
+        res.body.articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
+  test("GET:404 sends an err msg if topic is invalid", () => {
+    return request(app)
+      .get("/api/articles?topic=banana")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
+});
