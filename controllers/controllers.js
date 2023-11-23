@@ -9,6 +9,7 @@ const {
   insertComment,
   updateArticle,
   removeComment,
+  selectUsers,
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -83,6 +84,14 @@ exports.deleteComment = (req, res, next) => {
   removeComment(comment_id)
     .then(() => {
       res.status(204).send();
+    })
+    .catch(next);
+};
+
+exports.getUsers = (req, res, next) => {
+  selectUsers()
+    .then((users) => {
+      res.status(200).send({ users });
     })
     .catch(next);
 };
