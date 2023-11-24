@@ -379,3 +379,127 @@ describe("GET /api/articles?topic", () => {
       });
   });
 });
+
+describe("GET /api/articles?sort_by", () => {
+  test("GET:200 sends an array of articles sorted by created_at (date)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("GET:200 sends an array of articles sorted by article_id", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("article_id", {
+          descending: true,
+        });
+      });
+  });
+  test("GET:200 sends an array of articles sorted by title", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("title", { descending: true });
+      });
+  });
+  test("GET:200 sends an array of articles sorted by topic", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("topic", { descending: true });
+      });
+  });
+  test("GET:200 sends an array of articles sorted by author", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+  test("GET:200 sends an array of articles sorted by votes", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("votes", { descending: true });
+      });
+  });
+  test("GET:200 sends an array of articles sorted by article_img_url", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_img_url")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("article_img_url", {
+          descending: true,
+        });
+      });
+  });
+  test("GET:200 sends an array of articles sorted by comment_count", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("comment_count", {
+          descending: true,
+        });
+      });
+  });
+  test("GET:400 sends an err msg when given an invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=banana")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+});
+
+describe("GET /api/articles?order", () => {
+  test("GET:200 sends an array of articles in descending order", () => {
+    return request(app)
+      .get("/api/articles?order=desc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("GET:200 sends an array of articles in ascending order", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(13);
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
+  test("GET:400 sends an err msg when given an invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=banana")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+});
