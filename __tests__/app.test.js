@@ -503,3 +503,50 @@ describe("GET /api/articles?order", () => {
       });
   });
 });
+
+describe("GET /api/articles?", () => {
+  test("GET:200 accepts a combination of queries", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=article_id&order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(12);
+        res.body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+        expect(res.body.articles).toBeSortedBy("article_id", { descending: false });
+      });
+  });
+  test("GET:200 sends an empty array of articles when topic exists but has no associated articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper&sort_by=article_id&order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toEqual([]);
+      });
+  });
+  test("GET:404 sends an err msg if topic query is invalid", () => {
+    return request(app)
+      .get("/api/articles?topic=banana&sort_by=article_id&order=asc")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("does not exist");
+      });
+  });
+  test("GET:400 sends an err msg if sort_by query is invalid", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=banana&order=asc")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+  test("GET:400 sends an err msg if order query is invalid", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=article_id&order=banana")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+});
