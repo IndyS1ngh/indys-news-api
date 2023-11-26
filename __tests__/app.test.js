@@ -47,6 +47,17 @@ describe("ANY /api/banana", () => {
   });
 });
 
+describe("ANY /banana", () => {
+  test("GET:404 sends an error message when path is invalid", () => {
+    return request(app)
+      .get("/banana")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("path not found");
+      });
+  });
+});
+
 describe("GET /api", () => {
   test("GET:200 provides a description of all other endpoints available", () => {
     return request(app)
