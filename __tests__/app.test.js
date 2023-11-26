@@ -268,7 +268,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-  test("PATCH:200 updates an articles votes by id and sends the updated article back", () => {
+  test("PATCH:200 updates an articles votes by id and sends the updated article back (decrement)", () => {
     const input = { inc_votes: -100 };
     return request(app)
       .patch("/api/articles/1")
@@ -288,6 +288,26 @@ describe("PATCH /api/articles/:article_id", () => {
         });
       });
   });
+  test("PATCH:200 updates an articles votes by id and sends the updated article back (increment)", () => {
+    const input = { inc_votes: 100 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 200,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
   test("PATCH:400 responds with an appropriate status and error message when provided with a bad vote (no inc_votes)", () => {
     return request(app)
       .patch("/api/articles/1")
@@ -300,14 +320,16 @@ describe("PATCH /api/articles/:article_id", () => {
   test("PATCH:404 returns an err msg if article id is valid but not found", () => {
     return request(app)
       .patch("/api/articles/99")
+      .send({ inc_votes: 100 })
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("not found");
+        expect(res.body.msg).toBe("article not found");
       });
   });
   test("PATCH:400 returns an err msg if article id is invalid", () => {
     return request(app)
       .patch("/api/articles/banana")
+      .send({ inc_votes: 100 })
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("bad request");
@@ -324,7 +346,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/999")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("not found");
+        expect(res.body.msg).toBe("comment not found");
       });
   });
   test("DELETE:400 returns an err msg if comment id is invalid", () => {
@@ -525,7 +547,9 @@ describe("GET /api/articles?", () => {
         res.body.articles.forEach((article) => {
           expect(article.topic).toBe("mitch");
         });
-        expect(res.body.articles).toBeSortedBy("article_id", { descending: false });
+        expect(res.body.articles).toBeSortedBy("article_id", {
+          descending: false,
+        });
       });
   });
   test("GET:200 sends an empty array of articles when topic exists but has no associated articles", () => {
@@ -582,6 +606,70 @@ describe("GET /api/users/:username", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("username does not exist");
+      });
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("PATCH:200 updates a comments votes by id and sends the updated comment back (decrement)", () => {
+    const input = { inc_votes: -100 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(input)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: -84,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: "2020-04-06T12:17:00.000Z",
+        });
+      });
+  });
+  test("PATCH:200 updates a comments votes by id and sends the updated comment back (increment)", () => {
+    const input = { inc_votes: 100 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(input)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 116,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: "2020-04-06T12:17:00.000Z",
+        });
+      });
+  });
+  test("PATCH:400 responds with an appropriate status and error message when provided with a bad vote (no inc_votes)", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({})
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+  test("PATCH:404 returns an err msg if comment id is valid but not found", () => {
+    return request(app)
+      .patch("/api/comments/99")
+      .send({ inc_votes: 100 })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("comment not found");
+      });
+  });
+  test("PATCH:400 returns an err msg if comment id is invalid", () => {
+    return request(app)
+      .patch("/api/comments/banana")
+      .send({ inc_votes: 100 })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
       });
   });
 });

@@ -93,7 +93,7 @@ exports.updateArticle = (article_id, newVote) => {
     )
     .then(({ rows }) => {
       if (!rows.length) {
-        return Promise.reject({ status: 404, msg: "not found" });
+        return Promise.reject({ status: 404, msg: "article not found" });
       }
       return rows[0];
     });
@@ -104,9 +104,24 @@ exports.removeComment = (comment_id) => {
     .query(`DELETE FROM comments WHERE comment_id = $1;`, [comment_id])
     .then((res) => {
       if (res.rowCount === 0) {
-        return Promise.reject({ status: 404, msg: "not found" });
+        return Promise.reject({ status: 404, msg: "comment not found" });
       }
       return;
+    });
+};
+
+exports.updateComment = (comment_id, newVote) => {
+  const { inc_votes } = newVote;
+  return db
+    .query(
+      `UPDATE comments SET votes = votes + $1 WHERE comment_id = $2 RETURNING *;`,
+      [inc_votes, comment_id]
+    )
+    .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({ status: 404, msg: "comment not found" });
+      }
+      return rows[0];
     });
 };
 
